@@ -59,6 +59,14 @@ public function quatorze() {
     array('designation' => $salle->__toString()));
     //ou seulement $salle
 }
+
+public function voir($id) {
+    $salle = $this->getDoctrine()->getRepository(Salle::class)->find($id);
+    if(!$salle)
+    throw $this->createNotFoundException('Salle[id='.$id.'] inexistante');
+    return $this->render('salle/voir.html.twig', 
+    array('salle' => $salle));
+    }
        
 
 }

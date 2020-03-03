@@ -26,4 +26,10 @@ salle_tp_treize:
 
 salle_tp_quatorze:
  path: /quatorze
- controller: App\Controller\SalleController::quatorze 
+ controller: App\Controller\SalleController::quatorze
+
+salle_tp_voir:
+ path: /voir/{id}
+ controller: App\Controller\SalleController::voir
+ requirements:
+  numero: \d+
