@@ -8,13 +8,22 @@ use App\Entity\Salle;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\Session\Session;
+use App\Form\Type\SalleType;
 
 
 class SalleController extends AbstractController{
-public function accueil() {
-    $nombre = rand(1,84);
+public function accueil(Session $session) {
+    /*$nombre = rand(1,84);
     return $this->render('salle/accueil.html.twig',
-    array('numero' => $nombre)); // ou ['numero'=>$nombre]);
+    array('numero' => $nombre)); // ou ['numero'=>$nombre]);*/
+
+    if ($session->has('nbreFois'))
+        $session->set('nbreFois', $session->get('nbreFois')+1);
+    else
+        $session->set('nbreFois', 1);
+    return $this->render('salle/accueil.html.twig',
+        array('nbreFois' => $session->get('nbreFois')));
 }
 
 public function afficher($numero) {
@@ -73,14 +82,12 @@ public function voir($id) {
 
 public function ajouter2(Request $request) {
     $salle = new Salle;
-    $form = $this->createFormBuilder($salle)
-        ->add('batiment', TextType::class)
-        ->add('etage', IntegerType::class)
-        ->add('numero', IntegerType::class)
-        ->add('envoyer', SubmitType::class)
-        ->getForm();
+    $form = $this->createForm(SalleType::class, $salle,
+    ['action' => $this->generateUrl('salle_tp_ajouter2')]);
+    $form->add('submit', SubmitType::class,
+    array('label' => 'Ajouter'));
     $form->handleRequest($request);
-    if ($form->isSubmitted() && $form->isValid()) {
+    if ($form->isSubmitted() && $form->isValid())  {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($salle);
         $entityManager->flush();
@@ -90,5 +97,44 @@ public function ajouter2(Request $request) {
     return $this->render('salle/ajouter2.html.twig',
         array('monFormulaire' => $form->createView()));
 }
+
+public function navigation() {
+    $salles = $this->getDoctrine()
+    ->getRepository(Salle::class)->findAll();
+    return $this->render('salle/navigation.html.twig',
+    array('salles' => $salles));
+}
+
+public function modifier($id) {
+    $salle = $this->getDoctrine()->getRepository(Salle::class)->find($id);
+    if(!$salle)
+    throw $this->createNotFoundException('Salle[id='.$id.'] inexistante');
+    $form = $this->createForm(SalleType::class, $salle,
+    ['action' => $this->generateUrl('salle_tp_modifier_suite',
+    array('id' => $salle->getId()))]);
+    $form->add('submit', SubmitType::class, array('label' => 'Modifier'));
+    return $this->render('salle/modifier.html.twig',
+    array('monFormulaire' => $form->createView()));
+    }
+    public function modifierSuite(Request $request, $id) {
+    $salle = $this->getDoctrine()->getRepository(Salle::class)->find($id);
+    if(!$salle)
+    throw $this->createNotFoundException('Salle[id='.$id.'] inexistante');
+    $form = $this->createForm(SalleType::class, $salle,
+    ['action' => $this->generateUrl('salle_tp_modifier_suite',
+    array('id' => $salle->getId()))]);
+    $form->add('submit', SubmitType::class, array('label' => 'Modifier'));
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+    $entityManager = $this->getDoctrine()->getManager();
+    $entityManager->persist($salle);
+    $entityManager->flush();
+    $url = $this->generateUrl('salle_tp_voir',
+    array('id' => $salle->getId()));
+    return $this->redirect($url);
+    }
+    return $this->render('salle/modifier.html.twig',
+    array('monFormulaire' => $form->createView()));
+    }
    
 }
