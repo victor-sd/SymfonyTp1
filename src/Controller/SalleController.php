@@ -5,6 +5,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\Salle;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 
 class SalleController extends AbstractController{
@@ -66,7 +69,26 @@ public function voir($id) {
     throw $this->createNotFoundException('Salle[id='.$id.'] inexistante');
     return $this->render('salle/voir.html.twig', 
     array('salle' => $salle));
-    }
-       
+}
 
+public function ajouter2(Request $request) {
+    $salle = new Salle;
+    $form = $this->createFormBuilder($salle)
+        ->add('batiment', TextType::class)
+        ->add('etage', IntegerType::class)
+        ->add('numero', IntegerType::class)
+        ->add('envoyer', SubmitType::class)
+        ->getForm();
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($salle);
+        $entityManager->flush();
+        return $this->redirectToRoute('salle_tp_voir',
+            array('id' => $salle->getId()));
+    }
+    return $this->render('salle/ajouter2.html.twig',
+        array('monFormulaire' => $form->createView()));
+}
+   
 }

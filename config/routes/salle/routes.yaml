@@ -33,3 +33,7 @@ salle_tp_voir:
  controller: App\Controller\SalleController::voir
  requirements:
   numero: \d+
+
+salle_tp_ajouter2:
+ path: /ajouter2
+ controller: App\Controller\SalleController::ajouter2
