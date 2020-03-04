@@ -38,6 +38,14 @@ class Salle
      */
     private $numero;
 
+    /**
+    * @ORM\PrePersist
+    * @ORM\PreUpdate
+    */
+ public function corrigeNomBatiment() {
+    $this->batiment = strtoupper($this->batiment);
+    } 
+
     public function getId(): ?int
     {
         return $this->id;
