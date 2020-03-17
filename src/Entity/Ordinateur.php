@@ -34,6 +34,7 @@ class Ordinateur
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Salle", inversedBy="ordinateurs", cascade="persist")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $salle;
 
