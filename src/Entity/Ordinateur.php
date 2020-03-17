@@ -32,6 +32,11 @@ class Ordinateur
      */
     private $marque;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Salle", inversedBy="ordinateurs", cascade="persist")
+     */
+    private $salle;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,6 +74,18 @@ class Ordinateur
     public function setMarque(?Marque $marque): self
     {
         $this->marque = $marque;
+
+        return $this;
+    }
+
+    public function getSalle(): ?Salle
+    {
+        return $this->salle;
+    }
+
+    public function setSalle(?Salle $salle): self
+    {
+        $this->salle = $salle;
 
         return $this;
     }
